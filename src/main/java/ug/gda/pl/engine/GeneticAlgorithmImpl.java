@@ -47,15 +47,19 @@ public class GeneticAlgorithmImpl implements GeneticAlgorithm {
 
         for (int generation = 0; generation < wrapper.getIterationNumber(); generation++) {
             log.info("Zaczynam generacje {}" + generation);
+
             generateFitnesResults(wrapper.getFitness(), wrapper.getPopulation());
             elliteFilter(wrapper);
-            getBestSollution(wrapper, generation);
 
-            buildNextGeneration(wrapper);
+            getBestSollution(wrapper, generation);
+            if(generation < wrapper.getIterationNumber()-1) buildNextGeneration(wrapper);
+
             log.info("Generacja nr {} gotowa " + generation);
         }
 
-        Collections.sort(wrapper.getPopulation(), fitnesComparator());
+        List<Individual> individualsToSort = new ArrayList<Individual>(wrapper.getPopulation());
+        Collections.sort(individualsToSort, fitnesComparator());
+        wrapper.setPopulation(individualsToSort);
 
         GenericAlgorithmResults genericAlgorithmResults = new GenericAlgorithmResults();
         genericAlgorithmResults.setResultCityList(wrapper.getPopulation().get(0).getCityList());
@@ -182,7 +186,10 @@ public class GeneticAlgorithmImpl implements GeneticAlgorithm {
 
     public void getBestSollution(GeneticAlgorithmWrapper wrapper, int generation) {
         wrapper.getGenerationResults().put(generation, wrapper.getPopulation().get(0).getFitnesResult());
-        log.info("Najlepsze rozwiazanie dla generacji {} wynosi {} ", generation, wrapper.getPopulation().get(0).getFitnesResult());
-        System.out.print("Najlepsze rozwiazanie dla generacji wynosi "+ generation+" "+ wrapper.getPopulation().get(0).getFitnesResult()+"\n");
+        System.out.println("Najlepsze rozwiazanie dla generacji +" +generation +" wynosi "+(-wrapper.getPopulation().get(0).getFitnesResult())+" m");
+
+        for(City city : wrapper.getPopulation().get(0).getCityList()){
+            System.out.print(" "+ city.getName()+" ->");
+        }
     }
 }
